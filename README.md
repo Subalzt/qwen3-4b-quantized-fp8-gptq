@@ -14,7 +14,7 @@ Models produced here are on the Hub:
 
 ---
 
-## 🎯 Goals
+## Goals
 
 - Measure how **quantization** (BF16 → FP8 → INT4) trades VRAM, speed, and quality.
 - Separate **format effects** from **runtime effects** (llama.cpp vs vLLM vs transformers).
@@ -22,7 +22,7 @@ Models produced here are on the Hub:
 - Push past benchmarking: **fine-tune a domain "coder"** and honestly test whether it worked.
 - Prove every claim with the **right metric and a paired test** — not vibes.
 
-## 🧰 What's installed / built
+## What's installed / built
 
 - **Runtimes:** llama.cpp (built from source for `sm_120`), vLLM 0.26, transformers 5.
 - **Quantizers:** llm-compressor (GPTQ / AWQ / FP8), GGUF `llama-quantize` + imatrix, bitsandbytes NF4.
@@ -30,21 +30,21 @@ Models produced here are on the Hub:
 - **Toolchain:** CUDA 13.3, PyTorch 2.13 + cu129, 3 isolated `uv` venvs (torch pins conflict).
 - **Harness:** `qbench/` — one schema, out-of-process VRAM sampler, backend adapters → uniform CSV.
 
-## ✅ What was done (the grid)
+## What was done (the grid)
 
 | level | experiment | status |
 |---|---|:--:|
-| **L1** | format sweep BF16 / Q8_0 / Q4_K_M (llama.cpp) | ✅ |
-| **L1.5** | native Blackwell FP8 (E4M3) | ✅ |
-| **L2·1** | GGUF importance-matrix calibration ablation | ✅ |
-| **L2·2** | data-aware INT4: GPTQ vs AWQ | ✅ |
-| **L3** | vLLM vs llama.cpp concurrency curve | ✅ |
-| **L4** | fp8 KV-cache + long context | ✅ |
-| **L5** | QLoRA domain "coder" fine-tune + honest eval | ✅ |
+| **L1** | format sweep BF16 / Q8_0 / Q4_K_M (llama.cpp) | done |
+| **L1.5** | native Blackwell FP8 (E4M3) | done |
+| **L2·1** | GGUF importance-matrix calibration ablation | done |
+| **L2·2** | data-aware INT4: GPTQ vs AWQ | done |
+| **L3** | vLLM vs llama.cpp concurrency curve | done |
+| **L4** | fp8 KV-cache + long context | done |
+| **L5** | QLoRA domain "coder" fine-tune + honest eval | done |
 
 ---
 
-## 🏆 Headline findings (what was accomplished)
+## Headline findings (what was accomplished)
 
 1. **8-bit is a free lunch; 4-bit is not.** Q8_0 / FP8 are quality-indistinguishable
    from BF16 (≤ +0.2 %) at 2–3× the speed / half the memory. The quality cost is
@@ -66,7 +66,7 @@ Models produced here are on the Hub:
 
 ---
 
-## 📊 Results — the comparison matrix
+## Results — the comparison matrix
 
 ### Quantization scorecard — llama.cpp / GGUF (speed + VRAM + quality, one runtime)
 
@@ -121,7 +121,7 @@ Models produced here are on the Hub:
 
 ---
 
-## ⚙️ The `sm_120` tax (why this needed real engineering)
+## The `sm_120` tax (why this needed real engineering)
 
 Blackwell consumer silicon is new enough that prebuilt CUDA wheels install,
 import, then die at kernel launch — or return garbage. `scripts/check_env.py`
@@ -138,7 +138,7 @@ reported `CORRUPT`, not `PASS`. Fights won:
 
 ---
 
-## 📁 Repository layout
+## Repository layout
 
 ```
 qbench/              the harness
@@ -158,7 +158,7 @@ results/             *.md write-ups + parsed *.json  (grid.csv = the uniform out
 ENVIRONMENT.md       full hardware + software provenance
 ```
 
-## 🔁 Reproduction
+## Reproduction
 
 ```bash
 # 1. main env (L1/L2/L5): torch 2.13 + cu129 for sm_120
@@ -178,7 +178,7 @@ vLLM and llm-compressor get their own venvs (`requirements/vllm.txt`,
 `requirements/compress.txt`) — several libraries pin torch incompatibly. See
 `ENVIRONMENT.md` for the full rationale.
 
-## 🧪 Methodology (the four rules)
+## Methodology (the four rules)
 
 - **VRAM sampled out-of-process** (NVML) — `torch.cuda.max_memory_allocated`
   can't see llama.cpp or vLLM. Idle baseline subtracted.
@@ -189,7 +189,7 @@ vLLM and llm-compressor get their own venvs (`requirements/vllm.txt`,
 - **Comparisons are paired** — overlapping error bars are the wrong test when
   both models saw the same items.
 
-## ⚠️ Limitations
+## Limitations
 
 - One model family on one GPU. *Method* findings should generalize; absolute
   numbers won't.
@@ -200,7 +200,7 @@ vLLM and llm-compressor get their own venvs (`requirements/vllm.txt`,
 - L4's "free 2×" is proven for VRAM/near-term quality, not adversarial
   long-context recall (needle-in-a-haystack).
 
-## 📜 License
+## License
 
 Apache-2.0 (`LICENSE`). Anchor model, datasets, and all quantization sources are
 permissive (Apache-2.0 / MIT / CC-BY / CC0). Derivative checkpoints inherit
