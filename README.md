@@ -47,6 +47,11 @@ downloads loses to the plain one at equal size. The recurring lesson is that
    forgetting, caught only by an objective generation eval, not by the training
    loss or a knowledge quiz. [→ L5](#l5--qlora-fine-tuning-honest-comparison)
 
+6. **fp8 KV cache is a free 2×.** Quantizing the KV cache to fp8 doubles context
+   /concurrency capacity exactly (25,968 → 51,936 tokens) with no measurable
+   quality loss — unlike *weight* 4-bit, which costs 3–6 %. On memory-bound
+   hardware it should be the default. [→ L4](#l4--attention-fp8-kv-cache--long-context)
+
 ---
 
 ## The `sm_120` tax (why this took real engineering)
@@ -157,6 +162,22 @@ of magnitude in quality at 2× their size. This is the transformers-runtime
 mirror of the L1 Q8_0 result: **8-bit is essentially free; the quality cost is
 all in the jump to 4-bit.**
 
+### L4 — attention: fp8 KV cache + long context
+
+Once a 4-bit model is loaded, the KV cache is what caps context and concurrency
+on 8 GB. vLLM KV-cache dtype at fixed VRAM (GPTQ weights):
+
+| kv_cache_dtype | KV tokens | vs fp16 | quality |
+|---|---:|---:|---|
+| auto (fp16) | 25,968 | 1.00× | coherent |
+| **fp8 (e4m3)** | **51,936** | **2.00×** | coherent, ~identical |
+
+Exactly 2× the token capacity (`3246 = 2 × 1623` GPU blocks), with **no
+measurable quality loss** — near-identical greedy output. fp16 can't even serve
+a 32k request (caps at ~26k); fp8 reaches ~52k. Unlike weight quantization
+(L2: +3–6% PPL), KV quantization to fp8 is effectively free — the cleanest
+cost/benefit in the study. [→ details](results/L4_kv_cache.md)
+
 ### L5 — QLoRA fine-tuning (honest comparison)
 
 Domain fine-tune (code / Linux / networking / security / VM), two evals, both
@@ -243,6 +264,8 @@ vLLM and llm-compressor get their own venvs (`requirements/vllm.txt`,
 - The L5 recovery run (lower LR, completion-only loss, replay, HumanEval
   guardrail) is designed but not executed — the negative result is the
   deliverable.
+- L4's fp8 KV "free 2×" is proven for VRAM capacity and near-term generation
+  quality, not for adversarial long-context recall (needle-in-a-haystack).
 
 ## License
 
