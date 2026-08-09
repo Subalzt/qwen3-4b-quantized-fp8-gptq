@@ -1,227 +1,164 @@
-# quant-bench
+# Qwen3-4B: Quantization → Coder
 
-**A controlled benchmark of LLM quantization, runtimes, and fine-tuning on a
-single 8 GB consumer Blackwell GPU — where every number is comparable because
-one anchor model is used throughout, and every comparison is backed by paired
-statistics.**
+**Taking one small model — [`Qwen/Qwen3-4B-Instruct-2507`](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)
+(Apache-2.0) — from BF16 all the way to a quantized, fine-tuned coder on a single
+8 GB laptop GPU, measuring every trade-off along the way.**
 
-Anchor model: [`Qwen/Qwen3-4B-Instruct-2507`](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)
-(Apache-2.0). Hardware: RTX 5070 Laptop (8 GB, `sm_120`), WSL2 / Ubuntu 26.04.
+> Hardware: RTX 5070 Laptop · 8 GB · Blackwell `sm_120` · WSL2 / Ubuntu 26.04
+> One anchor model throughout, so every number is comparable. Every comparison
+> is backed by **paired statistics**, not eyeballed error bars.
 
-This is not a leaderboard. It is a study of *how you measure*: the same weights
-scored two ways give a 10 % different perplexity; a model that looks fine on
-three prompts is 18 points worse on 164; the "smart" quantization everyone
-downloads loses to the plain one at equal size. The recurring lesson is that
-**the metric determines the conclusion.**
+Models produced here are on the Hub:
+[FP8](https://huggingface.co/Subalzt/Qwen3-4B-Instruct-2507-FP8) ·
+[GPTQ-W4A16](https://huggingface.co/Subalzt/Qwen3-4B-Instruct-2507-GPTQ-W4A16)
 
 ---
 
-## Headline findings
+## 🎯 Goals
 
-1. **Q8_0 is a free lunch; Q4 is not free.** Q8_0 quantization is
-   statistically indistinguishable from BF16 in quality (+0.05 % perplexity)
-   while running 3× faster and fully resident. Q4_K_M is 5× faster than BF16
-   but **+2.1 % perplexity — real, not noise** (paired t = 18, worse on 137/145
-   text chunks). Perplexity's tiny error bars *overlap*; the paired test does
-   not. [→ L1](#l1--format-sweep-runtime-held-constant)
+- Measure how **quantization** (BF16 → FP8 → INT4) trades VRAM, speed, and quality.
+- Separate **format effects** from **runtime effects** (llama.cpp vs vLLM vs transformers).
+- Do it all on **8 GB consumer hardware**, where the constraints are real.
+- Push past benchmarking: **fine-tune a domain "coder"** and honestly test whether it worked.
+- Prove every claim with the **right metric and a paired test** — not vibes.
 
-2. **The community's "smart" 4-bit quant loses to the naive one at equal size.**
-   A plain Q4_K_M with *no importance matrix* beat the widely-downloaded
-   imatrix quant by 0.64 % perplexity at 288 bytes smaller (p = 9e-7). The
-   importance matrix is a *transfer bet* that does not pay off out of its
-   calibration domain. [→ L2 round 1](#l2--data-aware-int4)
+## 🧰 What's installed / built
 
-3. **Perplexity is not comparable across runtimes.** The *same BF16 weights*
-   score 9.09 under llama.cpp and 10.02 under transformers — a **+0.93 (10 %)
-   offset from the runtime alone.** This is why the study is a (format ×
-   runtime) *grid*, not a ladder. [→ L2 round 2](#l2--data-aware-int4)
+- **Runtimes:** llama.cpp (built from source for `sm_120`), vLLM 0.26, transformers 5.
+- **Quantizers:** llm-compressor (GPTQ / AWQ / FP8), GGUF `llama-quantize` + imatrix, bitsandbytes NF4.
+- **Training:** PEFT + TRL QLoRA, sized for 8 GB.
+- **Toolchain:** CUDA 13.3, PyTorch 2.13 + cu129, 3 isolated `uv` venvs (torch pins conflict).
+- **Harness:** `qbench/` — one schema, out-of-process VRAM sampler, backend adapters → uniform CSV.
 
-4. **vLLM only wins at batch > 1 — and the curve proves it.** At one request
-   llama.cpp leads; by 32 concurrent requests vLLM delivers ~1.8× the aggregate
-   throughput and *holds* per-request speed via continuous batching while
-   llama.cpp collapses. [→ L3](#l3--runtime-concurrency-sweep)
+## ✅ What was done (the grid)
 
-5. **Naive QLoRA fine-tuning made the model measurably worse.** Domain-tuning on
-   22k curated examples cost **18 points of HumanEval coding ability**
-   (p = 2e-6) for **zero** measurable gain in security knowledge — catastrophic
-   forgetting, caught only by an objective generation eval, not by the training
-   loss or a knowledge quiz. [→ L5](#l5--qlora-fine-tuning-honest-comparison)
-
-6. **fp8 KV cache is a free 2×.** Quantizing the KV cache to fp8 doubles context
-   /concurrency capacity exactly (25,968 → 51,936 tokens) with no measurable
-   quality loss — unlike *weight* 4-bit, which costs 3–6 %. On memory-bound
-   hardware it should be the default. [→ L4](#l4--attention-fp8-kv-cache--long-context)
+| level | experiment | status |
+|---|---|:--:|
+| **L1** | format sweep BF16 / Q8_0 / Q4_K_M (llama.cpp) | ✅ |
+| **L1.5** | native Blackwell FP8 (E4M3) | ✅ |
+| **L2·1** | GGUF importance-matrix calibration ablation | ✅ |
+| **L2·2** | data-aware INT4: GPTQ vs AWQ | ✅ |
+| **L3** | vLLM vs llama.cpp concurrency curve | ✅ |
+| **L4** | fp8 KV-cache + long context | ✅ |
+| **L5** | QLoRA domain "coder" fine-tune + honest eval | ✅ |
 
 ---
 
-## The `sm_120` tax (why this took real engineering)
+## 🏆 Headline findings (what was accomplished)
 
-Blackwell consumer silicon (`sm_120`) is new enough that prebuilt CUDA wheels
-routinely install, import, and then die at kernel launch — or worse, return
-garbage. `scripts/check_env.py` therefore launches a **real kernel for every
-library** and checks numerics against a reference; anything with >0.5 relative
-error is reported `CORRUPT`, not `PASS`. Fights that had to be won:
-
-| symptom | cause | fix |
-|---|---|---|
-| CUDA 12.9 compiles nothing | glibc 2.43 redeclares `cospi`/`sinpi` | use CUDA 13.3 toolkit |
-| vLLM: `UVA is not available` | vLLM disables pinned memory on WSL by default | `VLLM_WSL2_ENABLE_PIN_MEMORY=1` |
-| AWQ: `device not ready` (async) | CUDA-event race in AWQ modifier on sm_120 | `CUDA_LAUNCH_BLOCKING=1` |
-| AWQ OOM at 2048 seqlen | activation caching heavier than GPTQ | shorten calibration to 512 |
-| bitsandbytes "corrupts INT8 on sm_120" (rumored) | — | **disproven**: measured rel-err 0.009 |
-
-Notably, the widely-repeated claim that bitsandbytes INT8 is broken on sm_120
-did not survive measurement.
+1. **8-bit is a free lunch; 4-bit is not.** Q8_0 / FP8 are quality-indistinguishable
+   from BF16 (≤ +0.2 %) at 2–3× the speed / half the memory. The quality cost is
+   *entirely* in the jump to 4-bit (+2–6 %).
+2. **The community's "smart" 4-bit quant loses to the plain one.** A no-imatrix
+   Q4_K_M beat the widely-downloaded imatrix quant at equal size (p = 9e-7). The
+   importance matrix is a *transfer bet* that doesn't pay off out of domain.
+3. **Perplexity isn't comparable across runtimes.** Same BF16 weights = 9.09
+   (llama.cpp) vs 10.02 (transformers): a **+0.93 offset from the runtime alone.**
+   Hence a *grid*, not a ladder.
+4. **GPTQ > AWQ** on this model (p = 3e-35) — and it was far more robust on 8 GB.
+5. **vLLM only wins past ~8 concurrent requests** — the crossover the throughput
+   curve makes explicit; a single-request test would pick the wrong runtime.
+6. **fp8 KV cache is a free 2×** context/concurrency (25,968 → 51,936 tokens),
+   zero quality loss.
+7. **The "coder" fine-tune backfired.** −18 HumanEval points for zero knowledge
+   gain — catastrophic forgetting, invisible to training loss and smoke tests,
+   caught only by an objective eval at scale. **The metric determines the conclusion.**
 
 ---
 
-## Results
+## 📊 Results — the comparison matrix
 
-All perplexity on wikitext-2-raw-v1, ctx 2048, non-overlapping chunks. Every
-comparison is **paired** (per-chunk t-test / McNemar), because at these sample
-sizes an unpaired error bar hides real effects. Scripts: `ppl_paired.py`,
-`mcnemar.py`.
+### Quantization scorecard — llama.cpp / GGUF (speed + VRAM + quality, one runtime)
 
-### L1 — format sweep, runtime held constant
+| format | bits | VRAM | decode t/s | PPL | Δ quality |
+|---|:--:|---:|---:|---:|---|
+| BF16 | 16 | 7083 MB | 24.9 | 9.0939 | baseline |
+| **Q8_0** | 8 | 4282 MB | 77.1 | 9.0981 | **+0.05 %** (negligible) |
+| **Q4_K_M** | 4 | 2633 MB | **116.8** | 9.2871 | +2.12 % (real, p≈0) |
 
-llama.cpp, so weight format is the only variable.
+### Quantization scorecard — transformers / safetensors (quality, separate baseline)
 
-| format | VRAM | prefill t/s | decode t/s | PPL | vs BF16 |
-|---|---:|---:|---:|---:|---|
-| BF16 (ngl 30) | 7083 MB | 2957 | 24.9 | 9.0939 | — |
-| **Q8_0** | 4282 MB | 5856 | 77.1 | 9.0981 | **+0.05 %** (p=0.02) |
-| Q4_K_M | 2633 MB | 5660 | 116.8 | 9.2871 | +2.12 % (t=18, p≈0) |
+| format | bits | size | PPL | Δ vs BF16 |
+|---|:--:|---:|---:|---|
+| BF16 | 16 | 7.5 GB | 10.0216 | baseline |
+| **FP8 (E4M3)** | 8 | 4.85 GB | 10.0415 | **+0.20 %** (near-lossless) |
+| GPTQ W4A16 | 4 | 2.48 GB | 10.3261 | +3.04 % |
+| AWQ W4A16 | 4 | 3.21 GB | 10.5907 | +5.68 % |
 
-Two sub-findings the split metrics exposed:
-- **The offload cliff.** BF16 decode *rises* to ngl 34 then collapses 5× at
-  ngl 35 — deliberately keeping 4 of 36 layers on CPU is far faster than
-  offloading all of them. A sweep that only tests `-ngl 99` is wrong by 5×.
-- **Prefill and decode want opposite offload settings** at long context, which
-  is exactly why the scorecard reports them separately, never combined.
+*(the two tables use different runtimes — see finding #3 — so read within a table, not across)*
 
-### L2 — data-aware INT4
+### Runtime under load — L3 concurrency (aggregate decode t/s)
 
-**Round 1 (GGUF / importance matrix), matched to <300 bytes:**
+| concurrent requests | llama.cpp | vLLM | winner |
+|---:|---:|---:|:--:|
+| 1 | **115.8** | 72.6 | llama.cpp |
+| 4 | **320.6** | 276.6 | llama.cpp |
+| 16 | 887.9 | **1010.6** | vLLM |
+| 32 | 1189.3 | **1887.5** | vLLM (1.6×) |
 
-| variant | wikitext PPL | held-out pile PPL |
-|---|---:|---:|
-| **V0 — no imatrix** | **9.2272** | 8.8356 |
-| bartowski (community imatrix) | 9.2871 | 8.8295 |
-
-V0 beats the community imatrix quant out-of-domain (p = 9e-7) and ties it
-in-domain. The imatrix *hurts* on text unlike its calibration set.
-
-**Round 2 (GPTQ vs AWQ, transformers):**
-
-| model | PPL | vs BF16 |
-|---|---:|---|
-| base BF16 | 10.0216 | — |
-| **GPTQ W4A16** | **10.3261** | +3.04 % |
-| AWQ W4A16 | 10.5907 | +5.68 % |
-
-GPTQ beats AWQ decisively (p = 3e-35) — though AWQ was handicapped by a shorter
-forced calibration (its activation cache OOM'd at full length on 8 GB). The
-BF16 row (10.02 here vs 9.09 under llama.cpp) is the +0.93 **runtime offset**:
-these numbers are internally comparable but *not* comparable to the L1 GGUF
-numbers.
-
-### L3 — runtime concurrency sweep
-
-vLLM (GPTQ) vs llama.cpp (Q4_K_M), aggregate decode tokens/sec vs simultaneous
-requests:
-
-| concurrency | llama.cpp agg | vLLM agg | per-req: llama.cpp → vLLM |
-|---:|---:|---:|---|
-| 1 | **115.8** | 72.6 | 115.8 → 72.6 |
-| 4 | **320.6** | 276.6 | 80.1 → 69.1 |
-| 16 | 887.9 | **1010.6** | 55.5 → 63.2 |
-| 32 | 1189.3 | **1887.5** | 37.2 → 59.0 |
-
-The **crossover is around concurrency 8–16**: llama.cpp is faster for a single
-stream, vLLM's PagedAttention / continuous batching wins under load, reaching
-~1.6× aggregate at 32 requests. The mechanism is in the per-request column —
-vLLM *holds* ~60 t/s per request while llama.cpp collapses from 116 to 37. A
-single-request benchmark would have declared llama.cpp the flat winner and been
-exactly wrong for a serving workload.
-
-### L1.5 — native FP8 (Blackwell)
-
-FP8_DYNAMIC (E4M3), data-free, scored under transformers alongside the L2
-checkpoints:
-
-| model | PPL | vs BF16 | size |
-|---|---:|---|---:|
-| base BF16 | 10.0216 | — | 7.5 GB |
-| **FP8 (E4M3)** | **10.0415** | **+0.20 %** (p=3e-7) | 4.85 GB |
-| GPTQ W4A16 | 10.3261 | +3.04 % | 2.48 GB |
-| AWQ W4A16 | 10.5907 | +5.68 % | 3.21 GB |
-
-FP8 on Blackwell's native tensor cores is **near-lossless** — the +0.20 % is
-statistically real but negligible, and it beats both 4-bit methods by an order
-of magnitude in quality at 2× their size. This is the transformers-runtime
-mirror of the L1 Q8_0 result: **8-bit is essentially free; the quality cost is
-all in the jump to 4-bit.**
-
-### L4 — attention: fp8 KV cache + long context
-
-Once a 4-bit model is loaded, the KV cache is what caps context and concurrency
-on 8 GB. vLLM KV-cache dtype at fixed VRAM (GPTQ weights):
-
-| kv_cache_dtype | KV tokens | vs fp16 | quality |
-|---|---:|---:|---|
-| auto (fp16) | 25,968 | 1.00× | coherent |
-| **fp8 (e4m3)** | **51,936** | **2.00×** | coherent, ~identical |
-
-Exactly 2× the token capacity (`3246 = 2 × 1623` GPU blocks), with **no
-measurable quality loss** — near-identical greedy output. fp16 can't even serve
-a 32k request (caps at ~26k); fp8 reaches ~52k. Unlike weight quantization
-(L2: +3–6% PPL), KV quantization to fp8 is effectively free — the cleanest
-cost/benefit in the study. [→ details](results/L4_kv_cache.md)
-
-### L5 — QLoRA fine-tuning (honest comparison)
-
-Domain fine-tune (code / Linux / networking / security / VM), two evals, both
-held out:
+### The coder fine-tune — L5 (both evals held out)
 
 | eval | base | fine-tuned | verdict |
 |---|---:|---:|---|
 | pentesting MCQ (knowledge) | 84.6 % | 86.3 % | tie (p = 0.45) |
 | **HumanEval (code generation)** | **87.8 %** | **70.7 %** | **−18 pts (p = 2e-6)** |
 
-Training loss fell smoothly, eval loss tracked it, and three smoke-test prompts
-looked great — yet the model lost 18 points of coding ability for no knowledge
-gain. The failure is invisible without an objective generation eval at scale.
-This is the study's thesis in one experiment.
+<details>
+<summary><b>More detail per level</b> (offload cliff, imatrix ablation, KV cache)</summary>
+
+- **L1 offload cliff:** BF16 decode *rises* to `ngl 34` then collapses 5× at
+  `ngl 35` — keeping 4 of 36 layers on CPU beats offloading all of them. A sweep
+  that only tests `-ngl 99` is wrong by 5×. Prefill and decode want *opposite*
+  offload settings, which is why speed is always reported split.
+- **L2·1 imatrix ablation** (matched to < 300 bytes): no-imatrix `9.2272` vs
+  community imatrix `9.2871` on wikitext (out-of-domain, p = 9e-7); a tie on
+  held-out pile (in-domain). The imatrix *hurts* on text unlike its calibration set.
+- **L4 KV cache:** `3246 = 2 × 1623` GPU blocks exactly; fp16 can't serve a 32k
+  request (~26k cap), fp8 reaches ~52k, with near-identical greedy output.
+  → [`results/L4_kv_cache.md`](results/L4_kv_cache.md)
+- Full write-ups: [`results/`](results/) (one `.md` per level).
+</details>
 
 ---
 
-## Repository layout
+## ⚙️ The `sm_120` tax (why this needed real engineering)
+
+Blackwell consumer silicon is new enough that prebuilt CUDA wheels install,
+import, then die at kernel launch — or return garbage. `scripts/check_env.py`
+launches a **real kernel per library** and checks numerics; > 0.5 rel-error is
+reported `CORRUPT`, not `PASS`. Fights won:
+
+| symptom | cause | fix |
+|---|---|---|
+| CUDA 12.9 compiles nothing | glibc 2.43 redeclares `cospi`/`sinpi` | CUDA **13.3** toolkit |
+| vLLM `UVA is not available` | vLLM disables pinned memory on WSL | `VLLM_WSL2_ENABLE_PIN_MEMORY=1` |
+| AWQ `device not ready` | CUDA-event race in AWQ on sm_120 | `CUDA_LAUNCH_BLOCKING=1` |
+| AWQ OOM at 2048 seqlen | activation caching heavier than GPTQ | calibration seqlen 512 |
+| "bitsandbytes INT8 corrupts on sm_120" | rumor | **disproven** — measured rel-err 0.009 |
+
+---
+
+## 📁 Repository layout
 
 ```
-qbench/              the harness: uniform schema + out-of-process VRAM + backends
+qbench/              the harness
   schema.py          the one Row every cell emits (57 comparable columns)
   vram.py            NVML sampler in a SEPARATE process (sees llama.cpp too)
-  backends.py        llama.cpp / vLLM adapters -> the same three metrics
-  runner.py          `python -m qbench.runner configs/grid.yaml` -> results/grid.csv
+  backends.py        llama.cpp / vLLM adapters -> the same 3 metrics
+  runner.py          python -m qbench.runner configs/grid.yaml -> results/grid.csv
 scripts/             one purpose each, all reproducible
   check_env.py       sm_120 capability matrix (launches real kernels)
-  ppl_paired.py      paired per-chunk perplexity test  <- the correct test
+  ppl_paired.py      paired per-chunk perplexity test   <- the correct test
   mcnemar.py         paired accuracy test
   quantize_hf.py     GPTQ / AWQ / QuIP / SpinQuant / AutoRound / FP8
   train_qlora.py     NF4 QLoRA, sized for 8 GB
   eval_humaneval.py  executable pass@1
-  run_l3_sweep.sh    the concurrency curve
-  ...
 configs/grid.yaml    the (format x runtime) grid
-results/             *.md write-ups + parsed *.json (raw *.log gitignored)
-requirements/        frozen deps per venv
+results/             *.md write-ups + parsed *.json  (grid.csv = the uniform output)
 ENVIRONMENT.md       full hardware + software provenance
 ```
 
-## Reproduction
-
-Three `uv` venvs are used because several libraries pin torch incompatibly
-(vLLM, llm-compressor). See `ENVIRONMENT.md` for the full rationale.
+## 🔁 Reproduction
 
 ```bash
 # 1. main env (L1/L2/L5): torch 2.13 + cu129 for sm_120
@@ -229,45 +166,42 @@ uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python torch==2.13.0 --index-url https://download.pytorch.org/whl/cu129
 uv pip install --python .venv/bin/python -r requirements/main.txt
 
-# 2. verify the GPU actually runs kernels (do this first, always)
+# 2. verify the GPU actually runs kernels (do this first, ALWAYS)
 .venv/bin/python scripts/check_env.py
 
-# 3. fetch the anchor model + a GGUF, then run the grid
+# 3. fetch the model + a GGUF, then run the grid
 .venv/bin/python scripts/fetch_model.py --repo Qwen/Qwen3-4B-Instruct-2507
 python -m qbench.runner configs/grid.yaml --out results/grid.csv
 ```
 
 vLLM and llm-compressor get their own venvs (`requirements/vllm.txt`,
-`requirements/compress.txt`).
+`requirements/compress.txt`) — several libraries pin torch incompatibly. See
+`ENVIRONMENT.md` for the full rationale.
 
-## Methodology notes
+## 🧪 Methodology (the four rules)
 
-- **VRAM is sampled out-of-process** via NVML. `torch.cuda.max_memory_allocated`
-  cannot see llama.cpp or vLLM; only a separate sampler sees what the driver
-  sees. A measured idle baseline is subtracted.
-- **Speed is always split** into prefill (prompt processing) and decode
-  (generation). A combined tok/s averages two curves that often point in
-  opposite directions.
-- **Quality is never perplexity alone.** PPL is a floor; it declared
-  quantization "free" and fine-tuning "a tie" — both wrong. Reasoning /
-  generation benchmarks are the deciding metric.
-- **Comparisons are paired.** The single most repeated methodological point
-  here: overlapping error bars are the wrong test when both models saw the same
-  items.
+- **VRAM sampled out-of-process** (NVML) — `torch.cuda.max_memory_allocated`
+  can't see llama.cpp or vLLM. Idle baseline subtracted.
+- **Speed always split** into prefill vs decode — a combined tok/s averages two
+  curves that point opposite ways.
+- **Quality never perplexity alone** — PPL called quantization "free" and the
+  fine-tune "a tie"; both wrong. Generation/reasoning benchmarks decide.
+- **Comparisons are paired** — overlapping error bars are the wrong test when
+  both models saw the same items.
 
-## Limitations
+## ⚠️ Limitations
 
-- One model family (Qwen3-4B) on one GPU. Findings about *method* should
-  generalize; absolute numbers will not.
-- WiFi/IoT fine-tuning domains stayed thin — no instruction datasets exist for
-  them on the Hub; reported honestly, not padded.
-- The L5 recovery run (lower LR, completion-only loss, replay, HumanEval
-  guardrail) is designed but not executed — the negative result is the
-  deliverable.
-- L4's fp8 KV "free 2×" is proven for VRAM capacity and near-term generation
-  quality, not for adversarial long-context recall (needle-in-a-haystack).
+- One model family on one GPU. *Method* findings should generalize; absolute
+  numbers won't.
+- WiFi/IoT fine-tune domains stayed thin — no instruction datasets exist for them
+  on the Hub; reported honestly, not padded.
+- The coder **recovery run** (lower LR, completion-only loss, replay, HumanEval
+  guardrail) is designed but not executed — the negative result is the deliverable.
+- L4's "free 2×" is proven for VRAM/near-term quality, not adversarial
+  long-context recall (needle-in-a-haystack).
 
-## License
+## 📜 License
 
-Apache-2.0 (`LICENSE`). The anchor model, datasets, and all quantization
-sources used are under permissive licenses (Apache-2.0 / MIT / CC-BY / CC0).
+Apache-2.0 (`LICENSE`). Anchor model, datasets, and all quantization sources are
+permissive (Apache-2.0 / MIT / CC-BY / CC0). Derivative checkpoints inherit
+Apache-2.0 with attribution to the Qwen team.
