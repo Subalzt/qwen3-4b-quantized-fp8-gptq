@@ -1,0 +1,30 @@
+# --- virtual environments (recreate from requirements/) ---
+.venv/
+.venv-vllm/
+.venv-compress/
+.venv-tools/
+
+# --- models & data (multi-GB; fetch via scripts/fetch_model.py etc.) ---
+models/
+data/
+*.gguf
+*.safetensors
+*.dat
+*.bin
+
+# --- HF / uv caches ---
+.cache/
+**/__pycache__/
+*.pyc
+
+# --- raw run logs (keep the parsed results/*.json and results/*.md) ---
+results/*.log
+/tmp/
+
+# --- editors / os ---
+.vscode/
+.idea/
+.DS_Store
+
+# --- large intermediate merge dirs ---
+*-merged/

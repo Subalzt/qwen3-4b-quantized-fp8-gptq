@@ -1,0 +1,174 @@
+{
+  "host": {
+    "python": "3.12.13",
+    "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "processor": "",
+    "nvidia_smi": "NVIDIA GeForce RTX 5070 Laptop GPU, 8151 MiB, 610.47",
+    "nvcc": "Cuda compilation tools, release 13.3, V13.3.73",
+    "wsl": true
+  },
+  "probes": [
+    {
+      "name": "torch cuda + bf16 matmul",
+      "level": "L1",
+      "status": "ok",
+      "detail": "torch 2.11.0+cu130 cuda13.0 sm_120 | vram 6.69/7.96 GB free",
+      "rel_err": null,
+      "seconds": 7.54,
+      "error": ""
+    },
+    {
+      "name": "sdpa attention (default path)",
+      "level": "L1",
+      "status": "ok",
+      "detail": "out (2, 16, 2048, 64)",
+      "rel_err": null,
+      "seconds": 0.02,
+      "error": ""
+    },
+    {
+      "name": "transformers import",
+      "level": "L1",
+      "status": "ok",
+      "detail": "v5.14.1",
+      "rel_err": null,
+      "seconds": 3.91,
+      "error": ""
+    },
+    {
+      "name": "fp8 torch._scaled_mm",
+      "level": "L1.5",
+      "status": "fail",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.15,
+      "error": "RuntimeError: Invalid scaling configuration."
+    },
+    {
+      "name": "torchao fp8 dynamic act+weight",
+      "level": "L1.5",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'torchao'"
+    },
+    {
+      "name": "torchao int4 weight-only",
+      "level": "L2",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'torchao'"
+    },
+    {
+      "name": "gptqmodel import",
+      "level": "L2",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'gptqmodel'"
+    },
+    {
+      "name": "compressed-tensors import",
+      "level": "L2",
+      "status": "ok",
+      "detail": "v0.17.0",
+      "rel_err": null,
+      "seconds": 15.62,
+      "error": ""
+    },
+    {
+      "name": "llama.cpp binaries (sm_120 build)",
+      "level": "L3",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: not built at /home/subalzt/llama.cpp/build/bin/llama-bench"
+    },
+    {
+      "name": "llama-cpp-python",
+      "level": "L3",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'llama_cpp'"
+    },
+    {
+      "name": "vLLM import",
+      "level": "L3",
+      "status": "ok",
+      "detail": "v0.26.0 (engine start is tested separately)",
+      "rel_err": null,
+      "seconds": 0.23,
+      "error": ""
+    },
+    {
+      "name": "flash-attn",
+      "level": "L4",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'flash_attn'"
+    },
+    {
+      "name": "flashinfer",
+      "level": "L4",
+      "status": "ok",
+      "detail": "v0.6.14 (JIT compiles on first use -- needs nvcc)",
+      "rel_err": null,
+      "seconds": 5.11,
+      "error": ""
+    },
+    {
+      "name": "bitsandbytes NF4",
+      "level": "L5",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'bitsandbytes'"
+    },
+    {
+      "name": "bitsandbytes INT8",
+      "level": "L5",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'bitsandbytes'"
+    },
+    {
+      "name": "peft / trl",
+      "level": "L5",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'peft'"
+    },
+    {
+      "name": "pynvml out-of-process VRAM sampling",
+      "level": "harness",
+      "status": "ok",
+      "detail": "driver 610.47 | 1077/8151 MiB used",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": ""
+    },
+    {
+      "name": "datasets (wikitext-2 + gsm8k reachable)",
+      "level": "harness",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'datasets'"
+    }
+  ]
+}

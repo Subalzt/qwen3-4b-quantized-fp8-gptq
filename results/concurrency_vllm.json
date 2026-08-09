@@ -1,0 +1,46 @@
+{
+ "label": "vllm",
+ "max_tokens": 128,
+ "rows": [
+  {
+   "concurrency": 1,
+   "wall_s": 1.763,
+   "total_gen_tokens": 128,
+   "aggregate_tok_s": 72.6,
+   "per_req_tok_s": 72.6,
+   "latency_s_mean": 1.762,
+   "latency_s_p50": 1.762,
+   "latency_s_p95": 1.762
+  },
+  {
+   "concurrency": 4,
+   "wall_s": 1.851,
+   "total_gen_tokens": 512,
+   "aggregate_tok_s": 276.6,
+   "per_req_tok_s": 69.1,
+   "latency_s_mean": 1.846,
+   "latency_s_p50": 1.85,
+   "latency_s_p95": 1.85
+  },
+  {
+   "concurrency": 16,
+   "wall_s": 2.027,
+   "total_gen_tokens": 2048,
+   "aggregate_tok_s": 1010.6,
+   "per_req_tok_s": 63.2,
+   "latency_s_mean": 2.02,
+   "latency_s_p50": 2.02,
+   "latency_s_p95": 2.025
+  },
+  {
+   "concurrency": 32,
+   "wall_s": 2.17,
+   "total_gen_tokens": 4096,
+   "aggregate_tok_s": 1887.5,
+   "per_req_tok_s": 59.0,
+   "latency_s_mean": 2.157,
+   "latency_s_p50": 2.159,
+   "latency_s_p95": 2.166
+  }
+ ]
+}

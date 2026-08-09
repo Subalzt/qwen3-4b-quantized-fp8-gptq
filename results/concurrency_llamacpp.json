@@ -1,0 +1,46 @@
+{
+ "label": "llamacpp",
+ "max_tokens": 128,
+ "rows": [
+  {
+   "concurrency": 1,
+   "wall_s": 1.106,
+   "total_gen_tokens": 128,
+   "aggregate_tok_s": 115.8,
+   "per_req_tok_s": 115.8,
+   "latency_s_mean": 1.105,
+   "latency_s_p50": 1.105,
+   "latency_s_p95": 1.105
+  },
+  {
+   "concurrency": 4,
+   "wall_s": 1.597,
+   "total_gen_tokens": 512,
+   "aggregate_tok_s": 320.6,
+   "per_req_tok_s": 80.1,
+   "latency_s_mean": 1.589,
+   "latency_s_p50": 1.595,
+   "latency_s_p95": 1.596
+  },
+  {
+   "concurrency": 16,
+   "wall_s": 2.307,
+   "total_gen_tokens": 2048,
+   "aggregate_tok_s": 887.9,
+   "per_req_tok_s": 55.5,
+   "latency_s_mean": 2.3,
+   "latency_s_p50": 2.301,
+   "latency_s_p95": 2.305
+  },
+  {
+   "concurrency": 32,
+   "wall_s": 3.444,
+   "total_gen_tokens": 4096,
+   "aggregate_tok_s": 1189.3,
+   "per_req_tok_s": 37.2,
+   "latency_s_mean": 3.432,
+   "latency_s_p50": 3.436,
+   "latency_s_p95": 3.439
+  }
+ ]
+}

@@ -1,0 +1,174 @@
+{
+  "host": {
+    "python": "3.12.13",
+    "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "processor": "",
+    "nvidia_smi": "NVIDIA GeForce RTX 5070 Laptop GPU, 8151 MiB, 610.47",
+    "nvcc": "Cuda compilation tools, release 13.3, V13.3.73",
+    "wsl": true
+  },
+  "probes": [
+    {
+      "name": "torch cuda + bf16 matmul",
+      "level": "L1",
+      "status": "ok",
+      "detail": "torch 2.13.0+cu129 cuda12.9 sm_120 | vram 6.67/7.96 GB free",
+      "rel_err": null,
+      "seconds": 2.3,
+      "error": ""
+    },
+    {
+      "name": "sdpa attention (default path)",
+      "level": "L1",
+      "status": "ok",
+      "detail": "out (2, 16, 2048, 64)",
+      "rel_err": null,
+      "seconds": 0.01,
+      "error": ""
+    },
+    {
+      "name": "transformers import",
+      "level": "L1",
+      "status": "ok",
+      "detail": "v5.14.1",
+      "rel_err": null,
+      "seconds": 0.98,
+      "error": ""
+    },
+    {
+      "name": "fp8 torch._scaled_mm",
+      "level": "L1.5",
+      "status": "ok",
+      "detail": "e4m3 [0-dim scales] rel_err=0.0377",
+      "rel_err": null,
+      "seconds": 0.17,
+      "error": ""
+    },
+    {
+      "name": "torchao fp8 dynamic act+weight",
+      "level": "L1.5",
+      "status": "ok",
+      "detail": "torchao 0.18.0 rel_err=0.0368",
+      "rel_err": null,
+      "seconds": 1.14,
+      "error": ""
+    },
+    {
+      "name": "torchao int4 weight-only",
+      "level": "L2",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: Requires mslk >= 1.0.0"
+    },
+    {
+      "name": "gptqmodel import",
+      "level": "L2",
+      "status": "ok",
+      "detail": "v7.3.2",
+      "rel_err": null,
+      "seconds": 2.61,
+      "error": ""
+    },
+    {
+      "name": "compressed-tensors import",
+      "level": "L2",
+      "status": "ok",
+      "detail": "v0.17.1",
+      "rel_err": null,
+      "seconds": 0.1,
+      "error": ""
+    },
+    {
+      "name": "llama.cpp binaries (sm_120 build)",
+      "level": "L3",
+      "status": "ok",
+      "detail": "usage: /home/subalzt/llama.cpp/build/bin/llama-bench [options] | ",
+      "rel_err": null,
+      "seconds": 0.52,
+      "error": ""
+    },
+    {
+      "name": "llama-cpp-python",
+      "level": "L3",
+      "status": "ok",
+      "detail": "v0.3.34 gpu_offload=True",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": ""
+    },
+    {
+      "name": "vLLM import",
+      "level": "L3",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'vllm'"
+    },
+    {
+      "name": "flash-attn",
+      "level": "L4",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'flash_attn'"
+    },
+    {
+      "name": "flashinfer",
+      "level": "L4",
+      "status": "skip",
+      "detail": "",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": "not installed: No module named 'flashinfer'"
+    },
+    {
+      "name": "bitsandbytes NF4",
+      "level": "L5",
+      "status": "ok",
+      "detail": "v0.50.0 rel_err=0.0922",
+      "rel_err": null,
+      "seconds": 0.04,
+      "error": ""
+    },
+    {
+      "name": "bitsandbytes INT8",
+      "level": "L5",
+      "status": "ok",
+      "detail": "v0.50.0 rel_err=0.0086",
+      "rel_err": null,
+      "seconds": 0.16,
+      "error": ""
+    },
+    {
+      "name": "peft / trl",
+      "level": "L5",
+      "status": "ok",
+      "detail": "peft 0.20.0 trl 1.9.2",
+      "rel_err": null,
+      "seconds": 0.23,
+      "error": ""
+    },
+    {
+      "name": "pynvml out-of-process VRAM sampling",
+      "level": "harness",
+      "status": "ok",
+      "detail": "driver 610.47 | 1127/8151 MiB used",
+      "rel_err": null,
+      "seconds": 0.04,
+      "error": ""
+    },
+    {
+      "name": "datasets (wikitext-2 + gsm8k reachable)",
+      "level": "harness",
+      "status": "ok",
+      "detail": "v5.0.1 (network fetch not attempted here)",
+      "rel_err": null,
+      "seconds": 0.0,
+      "error": ""
+    }
+  ]
+}

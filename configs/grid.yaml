@@ -1,0 +1,44 @@
+# The (format x runtime) grid. Each cell emits one uniform CSV row via
+#   python -m qbench.runner configs/grid.yaml --out results/grid.csv
+# Paths use ~ ; models must already be present (see README reproduction steps).
+
+cells:
+  # --- L1: format sweep, runtime held constant (llama.cpp) ---
+  - label: l1_bf16
+    level: L1
+    backend: llamacpp
+    model: ~/models/gguf/Qwen_Qwen3-4B-Instruct-2507-bf16.gguf
+    weight_format: bf16
+    quant_bits: 16
+    ngl: 30          # prefill-optimal; BF16 does not fully fit on 8GB
+    task: speed+ppl
+
+  - label: l1_q8_0
+    level: L1
+    backend: llamacpp
+    model: ~/models/gguf/Qwen_Qwen3-4B-Instruct-2507-Q8_0.gguf
+    weight_format: gguf_q8_0
+    quant_bits: 8
+    ngl: 99
+    task: speed+ppl
+
+  - label: l1_q4_k_m
+    level: L1
+    backend: llamacpp
+    model: ~/models/gguf/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf
+    weight_format: gguf_q4_k_m
+    quant_bits: 4
+    ngl: 99
+    task: speed+ppl
+
+  # --- L3: same model class, different runtime (speed only here; the
+  #     concurrency curve is scripts/concurrency_client.py) ---
+  - label: l3_vllm_gptq
+    level: L3
+    backend: vllm
+    model: ~/models/hf/R2-GPTQ
+    weight_format: gptq_int4
+    quant_bits: 4
+    p: 512
+    n: 128
+    n_seqs: 1

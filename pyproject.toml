@@ -1,0 +1,29 @@
+[project]
+name = "quant-bench"
+version = "0.1.0"
+description = "A controlled (format x runtime) benchmark of LLM quantization on consumer Blackwell hardware, using one anchor model so every number is comparable."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+keywords = ["llm", "quantization", "benchmark", "vllm", "llama.cpp", "gptq", "awq", "qlora", "blackwell", "sm_120"]
+
+# NOTE: torch and the CUDA stack are installed per-venv from requirements/*.txt
+# against the PyTorch cu129 index, not from PyPI. See README "Reproduction".
+# This list is the harness's own pure-python surface.
+dependencies = [
+    "pandas",
+    "pyyaml",
+    "requests",
+    "nvidia-ml-py",
+    "matplotlib",
+]
+
+[project.scripts]
+qbench = "qbench.runner:main"
+
+[tool.setuptools.packages.find]
+include = ["qbench*"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
