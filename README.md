@@ -1,4 +1,4 @@
-# Qwen3-4B: Quantization → FP8!
+# Qwen3-4B Quantization — FP8 & GPTQ
 
 **Taking one small model — [`Qwen/Qwen3-4B-Instruct-2507`](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)
 (Apache-2.0) — from BF16 all the way to a quantized, fine-tuned coder on a single
