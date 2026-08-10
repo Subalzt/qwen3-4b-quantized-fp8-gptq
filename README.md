@@ -76,16 +76,21 @@ Models produced here are on the Hub:
 | **Q8_0** | 8 | 4282 MB | 77.1 | 9.0981 | **+0.05 %** (negligible) |
 | **Q4_K_M** | 4 | 2633 MB | **116.8** | 9.2871 | +2.12 % (real, p≈0) |
 
-### Quantization scorecard — transformers / safetensors (quality, separate baseline)
+### Quantization scorecard — safetensors, the checkpoints I quantized (published on the Hub)
 
-| format | bits | size | PPL | Δ vs BF16 |
-|---|:--:|---:|---:|---|
-| BF16 | 16 | 7.5 GB | 10.0216 | baseline |
-| **FP8 (E4M3)** | 8 | 4.85 GB | 10.0415 | **+0.20 %** (near-lossless) |
-| GPTQ W4A16 | 4 | 2.48 GB | 10.3261 | +3.04 % |
-| AWQ W4A16 | 4 | 3.21 GB | 10.5907 | +5.68 % |
+| format | bits | VRAM | decode t/s | PPL | Δ vs BF16 |
+|---|:--:|---:|---:|---:|---|
+| BF16 | 16 | >8 GB (spills) | — | 10.0216 | baseline |
+| **FP8 (E4M3)** | 8 | 5.5 GB | 47.8 | 10.0415 | **+0.20 %** (near-lossless) |
+| **GPTQ W4A16** | 4 | **2.7 GB** | **58.0** | 10.3261 | +3.04 % |
+| AWQ W4A16 | 4 | 3.8 GB | 57.5 | 10.5907 | +5.68 % |
 
-*(the two tables use different runtimes — see finding #3 — so read within a table, not across)*
+Note the ordering: **4-bit decodes faster than 8-bit** (fewer weight bytes to read
+per token — decode is memory-bandwidth bound), and GPTQ is smallest+fastest while
+FP8 keeps the best quality. VRAM = transformers load (incl. ~1.3 GB CUDA context);
+decode t/s = single-stream vLLM; weights-on-disk are 4.85 / 2.48 / 3.21 GB.
+
+*(this table and the GGUF one above use different runtimes — see finding #3 — so read within a table, not across)*
 
 ### Runtime under load — L3 concurrency (aggregate decode t/s)
 
