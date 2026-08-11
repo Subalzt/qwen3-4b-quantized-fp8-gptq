@@ -1,8 +1,8 @@
-# Qwen3-4B Quantization — FP8 & GPTQ
+# Qwen3-4B Quantization — FP8, GPTQ & Abliteration
 
 **Taking one small model — [`Qwen/Qwen3-4B-Instruct-2507`](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)
-(Apache-2.0) — from BF16 all the way to a quantized, fine-tuned coder on a single
-8 GB laptop GPU, measuring every trade-off along the way.**
+(Apache-2.0) — from BF16 all the way to quantized, fine-tuned, and abliterated
+checkpoints on a single 8 GB laptop GPU, measuring every trade-off along the way.**
 
 > Hardware: RTX 5070 Laptop · 8 GB · Blackwell `sm_120` · WSL2 / Ubuntu 26.04
 > One anchor model throughout, so every number is comparable. Every comparison
