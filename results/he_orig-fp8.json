@@ -1,0 +1,829 @@
+{
+ "label": "orig-fp8",
+ "n": 164,
+ "pass@1": 0.8658536585365854,
+ "n_correct": 142,
+ "stderr_unpaired": 0.026612749160858103,
+ "records": [
+  {
+   "i": 0,
+   "task_id": "HumanEval/0",
+   "correct": true
+  },
+  {
+   "i": 1,
+   "task_id": "HumanEval/1",
+   "correct": true
+  },
+  {
+   "i": 2,
+   "task_id": "HumanEval/2",
+   "correct": true
+  },
+  {
+   "i": 3,
+   "task_id": "HumanEval/3",
+   "correct": true
+  },
+  {
+   "i": 4,
+   "task_id": "HumanEval/4",
+   "correct": true
+  },
+  {
+   "i": 5,
+   "task_id": "HumanEval/5",
+   "correct": true
+  },
+  {
+   "i": 6,
+   "task_id": "HumanEval/6",
+   "correct": true
+  },
+  {
+   "i": 7,
+   "task_id": "HumanEval/7",
+   "correct": true
+  },
+  {
+   "i": 8,
+   "task_id": "HumanEval/8",
+   "correct": true
+  },
+  {
+   "i": 9,
+   "task_id": "HumanEval/9",
+   "correct": true
+  },
+  {
+   "i": 10,
+   "task_id": "HumanEval/10",
+   "correct": true
+  },
+  {
+   "i": 11,
+   "task_id": "HumanEval/11",
+   "correct": true
+  },
+  {
+   "i": 12,
+   "task_id": "HumanEval/12",
+   "correct": true
+  },
+  {
+   "i": 13,
+   "task_id": "HumanEval/13",
+   "correct": true
+  },
+  {
+   "i": 14,
+   "task_id": "HumanEval/14",
+   "correct": true
+  },
+  {
+   "i": 15,
+   "task_id": "HumanEval/15",
+   "correct": true
+  },
+  {
+   "i": 16,
+   "task_id": "HumanEval/16",
+   "correct": true
+  },
+  {
+   "i": 17,
+   "task_id": "HumanEval/17",
+   "correct": true
+  },
+  {
+   "i": 18,
+   "task_id": "HumanEval/18",
+   "correct": true
+  },
+  {
+   "i": 19,
+   "task_id": "HumanEval/19",
+   "correct": true
+  },
+  {
+   "i": 20,
+   "task_id": "HumanEval/20",
+   "correct": true
+  },
+  {
+   "i": 21,
+   "task_id": "HumanEval/21",
+   "correct": true
+  },
+  {
+   "i": 22,
+   "task_id": "HumanEval/22",
+   "correct": true
+  },
+  {
+   "i": 23,
+   "task_id": "HumanEval/23",
+   "correct": true
+  },
+  {
+   "i": 24,
+   "task_id": "HumanEval/24",
+   "correct": true
+  },
+  {
+   "i": 25,
+   "task_id": "HumanEval/25",
+   "correct": true
+  },
+  {
+   "i": 26,
+   "task_id": "HumanEval/26",
+   "correct": false
+  },
+  {
+   "i": 27,
+   "task_id": "HumanEval/27",
+   "correct": true
+  },
+  {
+   "i": 28,
+   "task_id": "HumanEval/28",
+   "correct": true
+  },
+  {
+   "i": 29,
+   "task_id": "HumanEval/29",
+   "correct": true
+  },
+  {
+   "i": 30,
+   "task_id": "HumanEval/30",
+   "correct": true
+  },
+  {
+   "i": 31,
+   "task_id": "HumanEval/31",
+   "correct": true
+  },
+  {
+   "i": 32,
+   "task_id": "HumanEval/32",
+   "correct": false
+  },
+  {
+   "i": 33,
+   "task_id": "HumanEval/33",
+   "correct": true
+  },
+  {
+   "i": 34,
+   "task_id": "HumanEval/34",
+   "correct": true
+  },
+  {
+   "i": 35,
+   "task_id": "HumanEval/35",
+   "correct": true
+  },
+  {
+   "i": 36,
+   "task_id": "HumanEval/36",
+   "correct": true
+  },
+  {
+   "i": 37,
+   "task_id": "HumanEval/37",
+   "correct": true
+  },
+  {
+   "i": 38,
+   "task_id": "HumanEval/38",
+   "correct": false
+  },
+  {
+   "i": 39,
+   "task_id": "HumanEval/39",
+   "correct": true
+  },
+  {
+   "i": 40,
+   "task_id": "HumanEval/40",
+   "correct": true
+  },
+  {
+   "i": 41,
+   "task_id": "HumanEval/41",
+   "correct": true
+  },
+  {
+   "i": 42,
+   "task_id": "HumanEval/42",
+   "correct": true
+  },
+  {
+   "i": 43,
+   "task_id": "HumanEval/43",
+   "correct": true
+  },
+  {
+   "i": 44,
+   "task_id": "HumanEval/44",
+   "correct": true
+  },
+  {
+   "i": 45,
+   "task_id": "HumanEval/45",
+   "correct": true
+  },
+  {
+   "i": 46,
+   "task_id": "HumanEval/46",
+   "correct": true
+  },
+  {
+   "i": 47,
+   "task_id": "HumanEval/47",
+   "correct": true
+  },
+  {
+   "i": 48,
+   "task_id": "HumanEval/48",
+   "correct": true
+  },
+  {
+   "i": 49,
+   "task_id": "HumanEval/49",
+   "correct": true
+  },
+  {
+   "i": 50,
+   "task_id": "HumanEval/50",
+   "correct": false
+  },
+  {
+   "i": 51,
+   "task_id": "HumanEval/51",
+   "correct": true
+  },
+  {
+   "i": 52,
+   "task_id": "HumanEval/52",
+   "correct": true
+  },
+  {
+   "i": 53,
+   "task_id": "HumanEval/53",
+   "correct": true
+  },
+  {
+   "i": 54,
+   "task_id": "HumanEval/54",
+   "correct": false
+  },
+  {
+   "i": 55,
+   "task_id": "HumanEval/55",
+   "correct": true
+  },
+  {
+   "i": 56,
+   "task_id": "HumanEval/56",
+   "correct": true
+  },
+  {
+   "i": 57,
+   "task_id": "HumanEval/57",
+   "correct": true
+  },
+  {
+   "i": 58,
+   "task_id": "HumanEval/58",
+   "correct": true
+  },
+  {
+   "i": 59,
+   "task_id": "HumanEval/59",
+   "correct": true
+  },
+  {
+   "i": 60,
+   "task_id": "HumanEval/60",
+   "correct": true
+  },
+  {
+   "i": 61,
+   "task_id": "HumanEval/61",
+   "correct": true
+  },
+  {
+   "i": 62,
+   "task_id": "HumanEval/62",
+   "correct": false
+  },
+  {
+   "i": 63,
+   "task_id": "HumanEval/63",
+   "correct": true
+  },
+  {
+   "i": 64,
+   "task_id": "HumanEval/64",
+   "correct": true
+  },
+  {
+   "i": 65,
+   "task_id": "HumanEval/65",
+   "correct": false
+  },
+  {
+   "i": 66,
+   "task_id": "HumanEval/66",
+   "correct": true
+  },
+  {
+   "i": 67,
+   "task_id": "HumanEval/67",
+   "correct": true
+  },
+  {
+   "i": 68,
+   "task_id": "HumanEval/68",
+   "correct": true
+  },
+  {
+   "i": 69,
+   "task_id": "HumanEval/69",
+   "correct": true
+  },
+  {
+   "i": 70,
+   "task_id": "HumanEval/70",
+   "correct": true
+  },
+  {
+   "i": 71,
+   "task_id": "HumanEval/71",
+   "correct": true
+  },
+  {
+   "i": 72,
+   "task_id": "HumanEval/72",
+   "correct": true
+  },
+  {
+   "i": 73,
+   "task_id": "HumanEval/73",
+   "correct": true
+  },
+  {
+   "i": 74,
+   "task_id": "HumanEval/74",
+   "correct": true
+  },
+  {
+   "i": 75,
+   "task_id": "HumanEval/75",
+   "correct": true
+  },
+  {
+   "i": 76,
+   "task_id": "HumanEval/76",
+   "correct": true
+  },
+  {
+   "i": 77,
+   "task_id": "HumanEval/77",
+   "correct": false
+  },
+  {
+   "i": 78,
+   "task_id": "HumanEval/78",
+   "correct": true
+  },
+  {
+   "i": 79,
+   "task_id": "HumanEval/79",
+   "correct": true
+  },
+  {
+   "i": 80,
+   "task_id": "HumanEval/80",
+   "correct": true
+  },
+  {
+   "i": 81,
+   "task_id": "HumanEval/81",
+   "correct": true
+  },
+  {
+   "i": 82,
+   "task_id": "HumanEval/82",
+   "correct": true
+  },
+  {
+   "i": 83,
+   "task_id": "HumanEval/83",
+   "correct": false
+  },
+  {
+   "i": 84,
+   "task_id": "HumanEval/84",
+   "correct": true
+  },
+  {
+   "i": 85,
+   "task_id": "HumanEval/85",
+   "correct": true
+  },
+  {
+   "i": 86,
+   "task_id": "HumanEval/86",
+   "correct": true
+  },
+  {
+   "i": 87,
+   "task_id": "HumanEval/87",
+   "correct": true
+  },
+  {
+   "i": 88,
+   "task_id": "HumanEval/88",
+   "correct": true
+  },
+  {
+   "i": 89,
+   "task_id": "HumanEval/89",
+   "correct": true
+  },
+  {
+   "i": 90,
+   "task_id": "HumanEval/90",
+   "correct": true
+  },
+  {
+   "i": 91,
+   "task_id": "HumanEval/91",
+   "correct": true
+  },
+  {
+   "i": 92,
+   "task_id": "HumanEval/92",
+   "correct": true
+  },
+  {
+   "i": 93,
+   "task_id": "HumanEval/93",
+   "correct": false
+  },
+  {
+   "i": 94,
+   "task_id": "HumanEval/94",
+   "correct": true
+  },
+  {
+   "i": 95,
+   "task_id": "HumanEval/95",
+   "correct": false
+  },
+  {
+   "i": 96,
+   "task_id": "HumanEval/96",
+   "correct": true
+  },
+  {
+   "i": 97,
+   "task_id": "HumanEval/97",
+   "correct": true
+  },
+  {
+   "i": 98,
+   "task_id": "HumanEval/98",
+   "correct": true
+  },
+  {
+   "i": 99,
+   "task_id": "HumanEval/99",
+   "correct": true
+  },
+  {
+   "i": 100,
+   "task_id": "HumanEval/100",
+   "correct": true
+  },
+  {
+   "i": 101,
+   "task_id": "HumanEval/101",
+   "correct": true
+  },
+  {
+   "i": 102,
+   "task_id": "HumanEval/102",
+   "correct": true
+  },
+  {
+   "i": 103,
+   "task_id": "HumanEval/103",
+   "correct": true
+  },
+  {
+   "i": 104,
+   "task_id": "HumanEval/104",
+   "correct": true
+  },
+  {
+   "i": 105,
+   "task_id": "HumanEval/105",
+   "correct": true
+  },
+  {
+   "i": 106,
+   "task_id": "HumanEval/106",
+   "correct": false
+  },
+  {
+   "i": 107,
+   "task_id": "HumanEval/107",
+   "correct": true
+  },
+  {
+   "i": 108,
+   "task_id": "HumanEval/108",
+   "correct": true
+  },
+  {
+   "i": 109,
+   "task_id": "HumanEval/109",
+   "correct": true
+  },
+  {
+   "i": 110,
+   "task_id": "HumanEval/110",
+   "correct": true
+  },
+  {
+   "i": 111,
+   "task_id": "HumanEval/111",
+   "correct": true
+  },
+  {
+   "i": 112,
+   "task_id": "HumanEval/112",
+   "correct": true
+  },
+  {
+   "i": 113,
+   "task_id": "HumanEval/113",
+   "correct": true
+  },
+  {
+   "i": 114,
+   "task_id": "HumanEval/114",
+   "correct": true
+  },
+  {
+   "i": 115,
+   "task_id": "HumanEval/115",
+   "correct": true
+  },
+  {
+   "i": 116,
+   "task_id": "HumanEval/116",
+   "correct": true
+  },
+  {
+   "i": 117,
+   "task_id": "HumanEval/117",
+   "correct": true
+  },
+  {
+   "i": 118,
+   "task_id": "HumanEval/118",
+   "correct": true
+  },
+  {
+   "i": 119,
+   "task_id": "HumanEval/119",
+   "correct": true
+  },
+  {
+   "i": 120,
+   "task_id": "HumanEval/120",
+   "correct": true
+  },
+  {
+   "i": 121,
+   "task_id": "HumanEval/121",
+   "correct": true
+  },
+  {
+   "i": 122,
+   "task_id": "HumanEval/122",
+   "correct": false
+  },
+  {
+   "i": 123,
+   "task_id": "HumanEval/123",
+   "correct": true
+  },
+  {
+   "i": 124,
+   "task_id": "HumanEval/124",
+   "correct": true
+  },
+  {
+   "i": 125,
+   "task_id": "HumanEval/125",
+   "correct": true
+  },
+  {
+   "i": 126,
+   "task_id": "HumanEval/126",
+   "correct": true
+  },
+  {
+   "i": 127,
+   "task_id": "HumanEval/127",
+   "correct": false
+  },
+  {
+   "i": 128,
+   "task_id": "HumanEval/128",
+   "correct": true
+  },
+  {
+   "i": 129,
+   "task_id": "HumanEval/129",
+   "correct": false
+  },
+  {
+   "i": 130,
+   "task_id": "HumanEval/130",
+   "correct": false
+  },
+  {
+   "i": 131,
+   "task_id": "HumanEval/131",
+   "correct": true
+  },
+  {
+   "i": 132,
+   "task_id": "HumanEval/132",
+   "correct": false
+  },
+  {
+   "i": 133,
+   "task_id": "HumanEval/133",
+   "correct": true
+  },
+  {
+   "i": 134,
+   "task_id": "HumanEval/134",
+   "correct": true
+  },
+  {
+   "i": 135,
+   "task_id": "HumanEval/135",
+   "correct": false
+  },
+  {
+   "i": 136,
+   "task_id": "HumanEval/136",
+   "correct": true
+  },
+  {
+   "i": 137,
+   "task_id": "HumanEval/137",
+   "correct": true
+  },
+  {
+   "i": 138,
+   "task_id": "HumanEval/138",
+   "correct": true
+  },
+  {
+   "i": 139,
+   "task_id": "HumanEval/139",
+   "correct": true
+  },
+  {
+   "i": 140,
+   "task_id": "HumanEval/140",
+   "correct": true
+  },
+  {
+   "i": 141,
+   "task_id": "HumanEval/141",
+   "correct": true
+  },
+  {
+   "i": 142,
+   "task_id": "HumanEval/142",
+   "correct": false
+  },
+  {
+   "i": 143,
+   "task_id": "HumanEval/143",
+   "correct": true
+  },
+  {
+   "i": 144,
+   "task_id": "HumanEval/144",
+   "correct": true
+  },
+  {
+   "i": 145,
+   "task_id": "HumanEval/145",
+   "correct": false
+  },
+  {
+   "i": 146,
+   "task_id": "HumanEval/146",
+   "correct": true
+  },
+  {
+   "i": 147,
+   "task_id": "HumanEval/147",
+   "correct": true
+  },
+  {
+   "i": 148,
+   "task_id": "HumanEval/148",
+   "correct": true
+  },
+  {
+   "i": 149,
+   "task_id": "HumanEval/149",
+   "correct": true
+  },
+  {
+   "i": 150,
+   "task_id": "HumanEval/150",
+   "correct": true
+  },
+  {
+   "i": 151,
+   "task_id": "HumanEval/151",
+   "correct": true
+  },
+  {
+   "i": 152,
+   "task_id": "HumanEval/152",
+   "correct": true
+  },
+  {
+   "i": 153,
+   "task_id": "HumanEval/153",
+   "correct": true
+  },
+  {
+   "i": 154,
+   "task_id": "HumanEval/154",
+   "correct": true
+  },
+  {
+   "i": 155,
+   "task_id": "HumanEval/155",
+   "correct": true
+  },
+  {
+   "i": 156,
+   "task_id": "HumanEval/156",
+   "correct": true
+  },
+  {
+   "i": 157,
+   "task_id": "HumanEval/157",
+   "correct": true
+  },
+  {
+   "i": 158,
+   "task_id": "HumanEval/158",
+   "correct": true
+  },
+  {
+   "i": 159,
+   "task_id": "HumanEval/159",
+   "correct": true
+  },
+  {
+   "i": 160,
+   "task_id": "HumanEval/160",
+   "correct": false
+  },
+  {
+   "i": 161,
+   "task_id": "HumanEval/161",
+   "correct": true
+  },
+  {
+   "i": 162,
+   "task_id": "HumanEval/162",
+   "correct": true
+  },
+  {
+   "i": 163,
+   "task_id": "HumanEval/163",
+   "correct": false
+  }
+ ]
+}
