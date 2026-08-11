@@ -83,7 +83,7 @@ Models produced here are on the Hub:
 | **Q8_0** | 8 | 4282 MB | 77.1 | 9.0981 | **+0.05 %** (negligible) |
 | **Q4_K_M** | 4 | 2633 MB | **116.8** | 9.2871 | +2.12 % (real, p≈0) |
 
-### Quantization scorecard — safetensors, the checkpoints I quantized (published on the Hub)
+### Quantization scorecard — safetensors, (the quantized checkpoints)
 
 | format | bits | VRAM | decode t/s | PPL | Δ vs BF16 |
 |---|:--:|---:|---:|---:|---|
