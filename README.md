@@ -10,7 +10,8 @@
 
 Models produced here are on the Hub:
 [FP8](https://huggingface.co/Subalzt/Qwen3-4B-Instruct-2507-FP8) ·
-[GPTQ-W4A16](https://huggingface.co/Subalzt/Qwen3-4B-Instruct-2507-GPTQ-W4A16)
+[GPTQ-W4A16](https://huggingface.co/Subalzt/Qwen3-4B-Instruct-2507-GPTQ-W4A16) ·
+[abliterated-FP8](https://huggingface.co/Subalzt/Qwen3-4B-Instruct-2507-abliterated-FP8) (research artifact)
 
 ---
 
@@ -41,6 +42,7 @@ Models produced here are on the Hub:
 | **L3** | vLLM vs llama.cpp concurrency curve | done |
 | **L4** | fp8 KV-cache + long context | done |
 | **L5** | QLoRA domain "coder" fine-tune + honest eval | done |
+| **L6** | abliteration (refusal-direction removal) + measured cost | done |
 
 ---
 
@@ -63,6 +65,11 @@ Models produced here are on the Hub:
 7. **The "coder" fine-tune backfired.** −18 HumanEval points for zero knowledge
    gain — catastrophic forgetting, invisible to training loss and smoke tests,
    caught only by an objective eval at scale. **The metric determines the conclusion.**
+8. **Abliteration costs more than quantization.** Removing the refusal direction
+   (Arditi 2024) cut refusals 100 % → ~17 %, but raised perplexity **+19.5 %** —
+   roughly **6× the +3.04 %** cost of 4-bit GPTQ — while HumanEval fell only −5.5 pts
+   (p = 0.093, *not* significant). Code eval says "fine," per-token PPL says "clearly
+   degraded" (145/145 chunks worse). The metric determines the conclusion, again.
 
 ---
 
@@ -107,6 +114,18 @@ decode t/s = single-stream vLLM; weights-on-disk are 4.85 / 2.48 / 3.21 GB.
 |---|---:|---:|---|
 | pentesting MCQ (knowledge) | 84.6 % | 86.3 % | tie (p = 0.45) |
 | **HumanEval (code generation)** | **87.8 %** | **70.7 %** | **−18 pts (p = 2e-6)** |
+
+### Abliteration — L6 (paired, vs the non-abliterated FP8)
+
+| metric | base FP8 | abliterated FP8 | Δ | paired test |
+|---|---:|---:|---:|---|
+| refusal (AdvBench held-out) | 100 % | ~17 % | −83 pp | intended effect |
+| HumanEval pass@1 | 86.6 % | 81.1 % | −5.5 pp | McNemar p = 0.093 (n.s.) |
+| perplexity (wikitext-2) | 10.0415 | 11.9987 | **+19.5 %** | paired t, p ≈ 2e-112 |
+
+The two capability metrics disagree — a functional code eval sees no significant
+loss, a dense per-token measure sees a large one. Harness validated: the base FP8
+reproduced PPL 10.0415 to the digit. → [`results/L6-abliteration.md`](results/L6-abliteration.md)
 
 <details>
 <summary><b>More detail per level</b> (offload cliff, imatrix ablation, KV cache)</summary>
@@ -158,6 +177,7 @@ scripts/             one purpose each, all reproducible
   quantize_hf.py     GPTQ / AWQ / QuIP / SpinQuant / AutoRound / FP8
   train_qlora.py     NF4 QLoRA, sized for 8 GB
   eval_humaneval.py  executable pass@1
+  abliterate.py      refusal-direction removal (Arditi 2024) + layer sweep
 configs/grid.yaml    the (format x runtime) grid
 results/             *.md write-ups + parsed *.json  (grid.csv = the uniform output)
 ENVIRONMENT.md       full hardware + software provenance
