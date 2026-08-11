@@ -1,4 +1,4 @@
-# Qwen3-4B Quantization — GPTQ, FP8 & Abliteration
+# qwen3-4b-quantized-gptq-fp8 & abliteration
 
 **Taking one small model — [`Qwen/Qwen3-4B-Instruct-2507`](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)
 (Apache-2.0) — from BF16 all the way to quantized, fine-tuned, and abliterated
